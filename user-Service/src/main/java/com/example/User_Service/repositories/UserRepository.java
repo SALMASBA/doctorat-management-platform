@@ -1,0 +1,56 @@
+package com.example.User_Service.repositories;
+
+
+
+
+import com.example.User_Service.entities.User;
+import com.example.User_Service.enums.Role;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface UserRepository extends JpaRepository<User, Long> {
+
+    // ✅ MODIFICATION : Recherche par Matricule
+    Optional<User> findByMatricule(String matricule);
+
+    // Garde la compatibilité avec Spring Security qui cherche "username"
+    default Optional<User> findByUsername(String username) {
+        return findByMatricule(username);
+    }
+
+    Optional<User> findByEmail(String email);
+
+    // ✅ MODIFICATION
+    boolean existsByMatricule(String matricule);
+
+    boolean existsByEmail(String email);
+
+    List<User> findByRole(Role role);
+
+    List<User> findByEnabledTrue();
+
+    List<User> findByRoleAndEnabledTrue(Role role);
+
+    List<User> findByEtat(String etat);
+
+    // ========== NOUVEAU : Pour les dérogations ==========
+
+    /**
+     * Récupérer tous les doctorants d'un directeur
+     */
+    List<User> findByDirecteurId(Long directeurId);
+
+    /**
+     * Récupérer les doctorants actifs d'un directeur
+     */
+    List<User> findByDirecteurIdAndEnabledTrue(Long directeurId);
+
+    /**
+     * Récupérer les doctorants d'un directeur par rôle
+     */
+    List<User> findByDirecteurIdAndRole(Long directeurId, Role role);
+}
