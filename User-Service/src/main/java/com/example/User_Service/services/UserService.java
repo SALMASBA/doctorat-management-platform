@@ -1,0 +1,45 @@
+package com.example.User_Service.services;
+
+
+
+
+import com.example.User_Service.dto.UserDTO;
+import com.example.User_Service.entities.User;
+import com.example.User_Service.enums.Role;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface UserService {
+
+    // CRUD
+    User createUser(User user);
+    User updateUser(Long id, User user);
+    void deleteUser(Long id);
+
+    // Recherche
+    Optional<User> getUserById(Long id);
+    Optional<User> getUserByUsername(String username);
+    Optional<User> getUserByEmail(String email);
+
+    // Listes
+    List<User> getAllUsers();
+    List<User> getUsersByRole(Role role);
+    List<User> getUsersByEtat(String etat);
+
+    // Rôle
+    User changeRole(Long id, Role newRole);
+
+    // Workflow Admin
+    User validerCandidature(Long id);
+    User validerCandidatureAvecDirecteur(Long id, Long directeurId);
+    User refuserCandidature(Long id, String motif);
+
+    // Workflow Directeur
+    User validerCandidatureDirecteur(Long id);
+    User validerCandidatureDirecteurAvecSujet(Long id, String sujetThese);
+    User refuserCandidatureDirecteur(Long id, String motif);
+
+    // ✅ NOUVEAU : Récupérer les doctorants d'un directeur
+    List<UserDTO> getDoctorantsByDirecteur(Long directeurId);
+}
