@@ -1,0 +1,172 @@
+<div class="container animate-fade-in" style="max-width: 900px;">
+    <div class="card">
+        <div class="text-center mb-4">
+            <h2>Demander un Document Officiel</h2>
+            <p class="text-muted">Sélectionnez le type de document et complétez les informations requises.</p>
+        </div>
+
+        <div *ngIf="message" class="alert success">{{ message }}</div>
+        <div *ngIf="error" class="alert error">{{ error }}</div>
+
+        <form (ngSubmit)="generate()">
+            <!-- Sélection du type de document -->
+            <div class="form-group mb-4">
+                <label>Type de document à générer</label>
+                <select [(ngModel)]="selectedType" name="docType" class="form-select">
+                    <option value="ATTESTATION_INSCRIPTION">Attestation d'Inscription</option>
+                    <option value="AUTORISATION_SOUTENANCE">Autorisation de Soutenance</option>
+                    <option value="PROCES_VERBAL">Procès-Verbal de Soutenance (Pré-rempli)</option>
+                    <option value="DEMANDE_MANUSCRITE">Demande Manuscrite au Chef d'Établissement</option>
+                    <option value="ATTESTATIONS_FORMATION">Relevé des Attestations de Formations</option>
+                </select>
+            </div>
+
+            <div class="section-title">Informations Personnelles</div>
+            <div class="grid-form">
+                <div class="form-group">
+                    <label>Prénom</label>
+                    <input type="text" [(ngModel)]="request.firstName" name="firstName" required>
+                </div>
+                <div class="form-group">
+                    <label>Nom</label>
+                    <input type="text" [(ngModel)]="request.lastName" name="lastName" required>
+                </div>
+            </div>
+
+            <div class="grid-form">
+                <div class="form-group">
+                    <label>CIN</label>
+                    <input type="text" [(ngModel)]="request.cin" name="cin" required>
+                </div>
+                <div class="form-group">
+                    <label>CNE</label>
+                    <input type="text" [(ngModel)]="request.cne" name="cne" required>
+                </div>
+            </div>
+
+            <div class="section-title">Thèse & Formation</div>
+            <div class="form-group">
+                <label>Formation Doctorale</label>
+                <input type="text" [(ngModel)]="request.formation" name="formation" required>
+            </div>
+
+            <div class="form-group" *ngIf="selectedType !== 'DEMANDE_MANUSCRITE'">
+                <label>Laboratoire de Recherche</label>
+                <input type="text" [(ngModel)]="request.laboratory" name="laboratory">
+            </div>
+
+            <div class="form-group">
+                <label>Titre de la Thèse</label>
+                <textarea [(ngModel)]="request.thesisTitle" name="thesisTitle" rows="2" required></textarea>
+            </div>
+
+            <!-- Champs spécifiques à la soutenance (Auth et PV) -->
+            <div
+                *ngIf="selectedType === 'AUTORISATION_SOUTENANCE' || selectedType === 'PROCES_VERBAL' || selectedType === 'DEMANDE_MANUSCRITE'">
+                <div class="form-group">
+                    <label>Directeur de Thèse</label>
+                    <input type="text" [(ngModel)]="request.directorName" name="directorName">
+                </div>
+            </div>
+
+            <div *ngIf="selectedType === 'AUTORISATION_SOUTENANCE' || selectedType === 'PROCES_VERBAL'">
+                <div class="grid-form">
+                    <div class="form-group">
+                        <label>Date prévue</label>
+                        <input type="date" [(ngModel)]="request.soutenanceDate" name="sDate">
+                    </div>
+                    <div class="form-group">
+                        <label>Heure</label>
+                        <input type="time" [(ngModel)]="request.soutenanceTime" name="sTime">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Lieu / Salle</label>
+                    <input type="text" [(ngModel)]="request.soutenanceLocation" name="sLoc"
+                        placeholder="Ex: Salle de conférence A">
+                </div>
+            </div>
+
+            <!-- Gestion du Jury (PV et Auth) -->
+            <div *ngIf="selectedType === 'AUTORISATION_SOUTENANCE' || selectedType === 'PROCES_VERBAL'" class="mt-4">
+                <div class="section-title">Composition du Jury</div>
+
+                <div class="jury-form p-3 mb-3 border rounded shadow-sm">
+                    <div class="grid-form">
+                        <div class="form-group">
+                            <label>Nom Membre</label>
+                            <input type="text" [(ngModel)]="juryMember.name" name="jName">
+                        </div>
+                        <div class="form-group">
+                            <label>Grade</label>
+                            <input type="text" [(ngModel)]="juryMember.grade" name="jGrade"
+                                placeholder="Ex: PES, PH...">
+                        </div>
+                    </div>
+                    <div class="grid-form">
+                        <div class="form-group">
+                            <label>Rôle</label>
+                            <select [(ngModel)]="juryMember.role" name="jRole">
+                                <option>Président</option>
+                                <option>Rapporteur</option>
+                                <option>Examinateur</option>
+                                <option>Directeur de thèse</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Université / Établissement</label>
+                            <input type="text" [(ngModel)]="juryMember.institution" name="jInst">
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-secondary btn-sm mt-2" (click)="addJuryMember()">Ajouter au
+                        jury</button>
+                </div>
+
+                <div class="table-responsive" *ngIf="request.juryMembers.length > 0">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Rôle</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let m of request.juryMembers; let i = index">
+                                <td>{{ m.name }} ({{ m.grade }})</td>
+                                <td>{{ m.role }}</td>
+                                <td>
+                                    <button type="button" class="btn text-danger"
+                                        (click)="removeJuryMember(i)">Supprimer</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Résultats (PV uniquement) -->
+            <div *ngIf="selectedType === 'PROCES_VERBAL'">
+                <div class="section-title">Résultats de la soutenance</div>
+                <div class="grid-form">
+                    <div class="form-group">
+                        <label>Décision</label>
+                        <input type="text" [(ngModel)]="request.decision" name="dec">
+                    </div>
+                    <div class="form-group">
+                        <label>Mention</label>
+                        <input type="text" [(ngModel)]="request.mention" name="ment">
+                    </div>
+                </div>
+            </div>
+
+            <div class="actions mt-4 text-center">
+                <button type="submit" class="btn btn-primary btn-lg" [disabled]="loading">
+                    <span *ngIf="loading">Génération en cours...</span>
+                    <span *ngIf="!loading">Générer le document PDF</span>
+                </button>
+                <a routerLink="/documents" class="btn btn-link mt-2 d-block">Retour à la liste</a>
+            </div>
+        </form>
+    </div>
+</div>

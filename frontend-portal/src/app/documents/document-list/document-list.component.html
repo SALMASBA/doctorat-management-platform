@@ -1,0 +1,71 @@
+<div class="container animate-fade-in">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1>Mes Documents</h1>
+      <p class="text-muted">Gérez vos dépôts et consultez vos documents officiels.</p>
+    </div>
+    <div class="actions">
+      <a routerLink="/upload" class="btn btn-primary mr-2">+ Déposer un document</a>
+      <a routerLink="/generate" class="btn btn-secondary">Demander un document</a>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs mb-4">
+    <button class="tab-btn" [class.active]="activeTab === 'uploads'" (click)="setActiveTab('uploads')">
+      Mes Dépôts
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'generated'" (click)="setActiveTab('generated')">
+      Documents Officiels
+    </button>
+  </div>
+
+  <!-- Uploads Content -->
+  <div *ngIf="activeTab === 'uploads'" class="tab-content">
+    <div *ngIf="uploadedDocs.length === 0 && !loading" class="empty-state">
+      <p>Aucun document déposé pour le moment.</p>
+    </div>
+
+    <div class="grid-cards">
+      <div class="card doc-card" *ngFor="let doc of uploadedDocs">
+        <div class="doc-icon">
+          <i class="bi bi-file-earmark-text"></i> <!-- Need to install bootstrap icons or use SVG later, assuming text for now -->
+          📄
+        </div>
+        <div class="doc-info">
+          <h3>{{ doc.documentType }}</h3>
+          <p class="filename">{{ doc.fileName }}</p>
+          <small>{{ doc.uploadDate | date:'medium' }}</small>
+        </div>
+        <div class="doc-actions">
+          <a [href]="getPreviewUrl(doc, 'upload')" target="_blank" class="btn-icon" title="Voir">👁️</a>
+          <a [href]="getDownloadUrl(doc, 'upload')" class="btn-icon" title="Télécharger">⬇️</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Generated Content -->
+  <div *ngIf="activeTab === 'generated'" class="tab-content">
+    <div *ngIf="generatedDocs.length === 0 && !loading" class="empty-state">
+      <p>Aucun document officiel généré pour le moment.</p>
+    </div>
+
+    <div class="grid-cards">
+      <div class="card doc-card generated" *ngFor="let doc of generatedDocs">
+        <div class="doc-icon">
+          🎓
+        </div>
+        <div class="doc-info">
+          <h3>{{ doc.title }}</h3>
+          <p class="reference">Ref: {{ doc.reference }}</p>
+          <small>{{ doc.generationDate | date:'medium' }}</small>
+        </div>
+        <div class="doc-actions">
+           <a [href]="getPreviewUrl(doc, 'generated')" target="_blank" class="btn-icon" title="Voir">👁️</a>
+           <a [href]="getDownloadUrl(doc, 'generated')" class="btn-icon" title="Télécharger">⬇️</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

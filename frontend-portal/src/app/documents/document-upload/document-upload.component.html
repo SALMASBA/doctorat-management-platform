@@ -1,0 +1,39 @@
+<div class="container animate-fade-in" style="max-width: 600px;">
+    <div class="card">
+        <div class="text-center mb-4">
+            <h2>Déposer un Document</h2>
+            <p class="text-muted">Ajoutez des pièces justificatives à votre dossier.</p>
+        </div>
+
+        <div *ngIf="message" class="alert success">{{ message }}</div>
+        <div *ngIf="error" class="alert error">{{ error }}</div>
+
+        <form (ngSubmit)="upload()">
+            <div class="form-group">
+                <label for="type">Type de document</label>
+                <select id="type" [(ngModel)]="documentType" name="documentType" required>
+                    <option *ngFor="let type of documentTypes" [value]="type.value">{{ type.label }}</option>
+                </select>
+            </div>
+
+            <div class="form-group file-area">
+                <input type="file" id="file" (change)="onFileSelected($event)" accept=".pdf,.jpg,.png"
+                    class="file-input">
+                <div class="file-dummy">
+                    <div class="success-icon" *ngIf="selectedFile">📄</div>
+                    <div class="default-icon" *ngIf="!selectedFile">📁</div>
+                    <span *ngIf="!selectedFile">Cliquez pour sélectionner un fichier (PDF, JPG, PNG)</span>
+                    <span *ngIf="selectedFile">{{ selectedFile.name }}</span>
+                </div>
+            </div>
+
+            <div class="actions mt-4 text-center">
+                <button type="submit" class="btn btn-primary" [disabled]="!selectedFile || uploading">
+                    <span *ngIf="uploading">Envoi en cours...</span>
+                    <span *ngIf="!uploading">Déposer le document</span>
+                </button>
+                <a routerLink="/documents" class="btn btn-link mt-2 d-block">Annuler</a>
+            </div>
+        </form>
+    </div>
+</div>

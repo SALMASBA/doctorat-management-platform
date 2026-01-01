@@ -1,0 +1,86 @@
+<nav class="navbar navbar-dark bg-dark mb-4 px-4 shadow-sm">
+    <span class="navbar-brand mb-0 h1"><i class="fas fa-user-shield me-2"></i> Administration Système</span>
+    <div class="ms-auto">
+        <a routerLink="/documents" class="btn btn-sm btn-outline-light">Retour au Portail</a>
+    </div>
+</nav>
+
+<div class="container animate-fade-in">
+    <div class="header-section text-center mb-5">
+        <h1 class="premium-title">Configuration Centralisée</h1>
+        <p class="text-muted">Gérez les paramètres de vos microservices en temps réel</p>
+    </div>
+
+    <div class="row">
+        <!-- Sidebar - Liste des fichiers -->
+        <div class="col-md-4">
+            <div class="card glass-card">
+                <div class="card-header">
+                    <h5>Fichiers de Config</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <button *ngFor="let file of files" (click)="onFileSelect(file)"
+                        [class.active]="selectedFile === file" class="list-group-item list-group-item-action">
+                        <i class="fas fa-file-code me-2"></i> {{ file }}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Editor - Contenu du fichier -->
+        <div class="col-md-8">
+            <div class="card glass-card shadow-lg" *ngIf="selectedFile">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5>Édition : {{ selectedFile }}</h5>
+                    <button class="btn btn-sm btn-outline-primary" (click)="addField()">
+                        + Ajouter une clé
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div *ngIf="message" class="alert alert-success">{{ message }}</div>
+
+                    <div class="config-table-container">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th width="40%">Clé (Property)</th>
+                                    <th>Valeur</th>
+                                    <th width="50"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let item of configData; let i = index">
+                                    <td>
+                                        <input type="text" [(ngModel)]="item.key"
+                                            class="form-control form-control-sm property-input"
+                                            placeholder="spring.datasource.url">
+                                    </td>
+                                    <td>
+                                        <input type="text" [(ngModel)]="item.value"
+                                            class="form-control form-control-sm value-input">
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-link text-danger p-0" (click)="removeField(i)">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="text-end mt-4">
+                        <button class="btn btn-primary premium-btn" (click)="saveConfig()">
+                            <i class="fas fa-save me-2"></i> Enregistrer les modifications
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center p-5 text-muted" *ngIf="!selectedFile">
+                <i class="fas fa-cog fa-4x mb-3 opacity-25"></i>
+                <p>Sélectionnez un fichier de configuration pour commencer l'édition</p>
+            </div>
+        </div>
+    </div>
+</div>
